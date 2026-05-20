@@ -6,59 +6,43 @@
     <title>远程拍摄系统</title>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* ========== 基础重置 ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
+        
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
-        }
-
-        /* ========== 主界面 ========== */
-        #mainBox {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100%;
+            min-height: 100vh;
             padding: 20px;
         }
-        .main-card {
+        
+        /* 主界面 */
+        .container {
             background: white;
             border-radius: 16px;
-            padding: 24px 20px;
-            max-width: 520px;
-            margin: 0 auto;
+            padding: 30px 20px;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        .main-card h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
-        .form-group { margin-bottom: 14px; }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+        h1 { text-align: center; color: #333; margin-bottom: 30px; font-size: 24px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #555; font-weight: 500; font-size: 14px; }
+        input, select {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px 16px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
         }
+        input:focus, select:focus { outline: none; border-color: #667eea; }
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: none;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-bottom: 10px;
             font-weight: 600;
         }
         .btn-primary {
@@ -66,109 +50,102 @@
             color: white;
         }
         .btn-success { background: #28a745; color: white; }
-        .section-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #667eea;
-            margin: 16px 0 8px 0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 4px;
-        }
         .link-box {
-            margin-top: 14px;
-            padding: 12px;
+            margin-top: 20px;
+            padding: 15px;
             background: #f8f9fa;
             border-radius: 8px;
             border: 1px dashed #ccc;
         }
         .link-box a {
             color: #667eea;
-            font-size: 12px;
-            word-break: break-all;
             text-decoration: none;
+            font-size: 13px;
+            word-break: break-all;
+        }
+        #copyBtn, #copyAliasBtn { display: none; }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            margin: 20px 0 10px 0;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 6px;
         }
         .alias-box {
             margin-top: 10px;
             padding: 10px;
             background: #e8f4fd;
             border-radius: 6px;
-            border: 1px solid #bee5eb;
             display: none;
         }
-        .toast {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.85);
+        
+        /* 拍摄界面 */
+        .capture-container {
+            display: none;
+            text-align: center;
             color: white;
-            padding: 14px 24px;
-            border-radius: 8px;
-            font-size: 14px;
-            display: none;
-            z-index: 9999;
+            padding: 40px 20px;
         }
-
-        /* ========== 拍摄界面 - 极简可见设计 ========== */
-        #capturePage {
-            display: none;
-            background-color: #2d2d44;
+        .capture-container h2 { font-size: 20px; margin-bottom: 20px; }
+        #video {
             width: 100%;
-            min-height: 100%;
-            padding: 50px 20px;
-        }
-        #capturePage * {
-            color: white;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        .cap-bg {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .cap-bg img,
-        .cap-bg video {
-            max-width: 100%;
+            max-width: 400px;
             border-radius: 12px;
-            max-height: 200px;
+            margin-bottom: 20px;
+            transform: scaleX(-1);
         }
-        .cap-warning {
-            background: #ffcc00;
-            color: #333 !important;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            font-size: 14px;
-            text-align: center;
-        }
-        .cap-title {
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 15px;
-            color: white !important;
-        }
-        .cap-desc {
-            font-size: 16px;
-            text-align: center;
-            margin-bottom: 40px;
-            line-height: 1.5;
-            color: #cccccc !important;
-        }
-        .cap-btn {
-            display: block;
-            width: 80%;
-            max-width: 300px;
-            margin: 0 auto;
-            padding: 16px;
+        #canvas { display: none; }
+        .status { font-size: 18px; margin-top: 20px; }
+        .btn-allow {
             background: #667eea;
-            color: white !important;
+            color: white;
+            padding: 16px 40px;
             border: none;
             border-radius: 30px;
             font-size: 18px;
-            text-align: center;
             cursor: pointer;
+            margin-top: 20px;
         }
-        .cap-spinner {
-            width: 40px;
-            height: 40px;
-            margin:
+        .warning-box {
+            background: rgba(255,200,0,0.2);
+            border: 1px solid #ffc800;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+            color: #ffc800;
+            display: none;
+        }
+        #previewImg {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 12px;
+            margin: 15px 0;
+            display: none;
+        }
+        .share-btns { display: none; margin-top: 20px; }
+        .btn-share { background: #28a745; color: white; padding: 16px 30px; border: none; border-radius: 30px; font-size: 18px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+        .btn-skip { background: rgba(255,255,255,0.2); color: white; padding: 12px 30px; border: 1px solid rgba(255,255,255,0.4); border-radius: 30px; font-size: 14px; cursor: pointer; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <!-- 主界面 -->
+    <div class="container" id="mainInterface">
+        <h1>📷 远程拍摄系统</h1>
+        
+        <div class="form-group">
+            <label>输入ID：</label>
+            <input type="text" id="myid" placeholder="输入您的ID"/>
+        </div>
+        <div class="form-group">
+            <label>拍摄后跳转到：</label>
+            <input type="text" id="url" value="http://baidu.com"/>
+        </div>
+
+        <div class="section-title">EmailJS 配置（可选，用于自动发邮件）</div>
+        <div class="form-group">
+            <label>Service ID：</label>
+            <input type="text" id="ejsService" placeholder="service_xxx"/>
+        </div>
+        <div
